@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="logo">
+    <file>logoPlaneta.png</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>icons/arrow-left-solid.svg</file>
+    <file>icons/caret-down-solid.svg</file>
+    <file>icons/square-caret-down-regular.svg</file>
+  </qresource>
+  <qresource prefix="calendar">
+    <file>icons/calendar-regular.svg</file>
+  </qresource>
+</RCC>
