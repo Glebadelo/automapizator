@@ -63,8 +63,7 @@ class LoadDataWindow(QDialog):
             self.zonesList.addItem(chkBox)
             chkBox.setText(zone)
 
-        #self.zonesList.itemChanged.connect(self.zoneSelected)
-        self.zonesList.itemClicked.connect(self.zoneClicked)
+        self.zonesList.itemClicked.connect(self.zoneClicked) #событие нажатия элемента списка зон
 
     # Создание чекбокса в листбоксе
     def LBItem(self, checked):
@@ -77,30 +76,21 @@ class LoadDataWindow(QDialog):
             item.setCheckState(QtCore.Qt.Unchecked)
         return item
 
+    #Функция вывода информации о зоне
     def zoneClicked(self):
         sender = self.sender()
-        name = sender.currentItem().text()
+        name = sender.currentItem().text() #текст выбранного элемента
         print(sender.currentItem().checkState())
-        if sender.currentItem().checkState() == 0:
-            sender.currentItem().setCheckState(QtCore.Qt.Checked)
-            info = 'По зоне {} найдено 4 сцен'.format(name)
+        if sender.currentItem().checkState() == 0: #если элемент был не отмечен
+            sender.currentItem().setCheckState(QtCore.Qt.Checked) #отметить
+            info = 'По зоне {} найдено 4 сцен'.format(name) #строка информации
             self.zonesInfoList.addItem(info)
-        elif sender.currentItem().checkState() == 2:
-            sender.currentItem().setCheckState(QtCore.Qt.Unchecked)
+        elif sender.currentItem().checkState() == 2: #если элемент был отмечен
+            sender.currentItem().setCheckState(QtCore.Qt.Unchecked) #снять отметку
+            for item in self.zonesInfoList.findItems(name, QtCore.Qt.MatchContains): #по тексту выбранного элепента находится совпадение в списке информации
+                self.zonesInfoList.takeItem(self.zonesInfoList.row(item)) # элемент удаляется
             print('удалить')
         print(sender.currentItem().checkState())
-
-
-        #sender.setCheckState(QtCore.Qt.Checked)
-
-    def zoneSelected(self):
-        name = self.zonesList.currentItem().text()
-        if self.zonesList.currentItem().checkState() == 2:
-            info = 'По зоне {} найдено 4 сцен'.format(name)
-            self.zonesInfoList.addItem(info)
-        elif self.zonesList.currentItem().checkState() == 0:
-            print('удалить')
-
 
     def returnToMW(self):
         widget.setCurrentIndex(0)
