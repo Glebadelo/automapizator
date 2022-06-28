@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>970</width>
-    <height>754</height>
+    <width>924</width>
+    <height>709</height>
    </rect>
   </property>
   <property name="cursor">
@@ -104,7 +104,7 @@
       </widget>
      </item>
      <item row="1" column="3">
-      <widget class="QDateEdit" name="dateEdit_2">
+      <widget class="QDateEdit" name="dateTo">
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -160,7 +160,7 @@ QDateEdit::drop-down{
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDateEdit" name="dateEdit">
+      <widget class="QDateEdit" name="dateFrom">
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -235,7 +235,7 @@ QDateEdit::drop-down{
 }</string>
        </property>
        <property name="text">
-        <string>По:</string>
+        <string>До:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -327,7 +327,7 @@ QDateEdit::drop-down{
         </font>
        </property>
        <property name="placeholderText">
-        <string>9.4</string>
+        <string>90</string>
        </property>
       </widget>
      </item>
@@ -358,8 +358,31 @@ QDateEdit::drop-down{
    </item>
    <item>
     <layout class="QGridLayout" name="zonesGrid">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>14</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLabel{
+	color: #F5F5F5;
+}</string>
+       </property>
+       <property name="text">
+        <string>Зоны интереса</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="openMap_btn">
        <property name="minimumSize">
         <size>
          <width>130</width>
@@ -396,38 +419,16 @@ QPushButton:hover{
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_6">
+     <item row="2" column="1">
+      <widget class="QPlainTextEdit" name="zonesInfoList">
        <property name="font">
         <font>
          <family>Segoe UI</family>
          <pointsize>14</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">QLabel{
-	color: #F5F5F5;
-}</string>
-       </property>
-       <property name="text">
-        <string>Зоны интереса</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QListWidget" name="zonesInfoList">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QListWidget{
+        <string notr="true">QPlainTextEdit{
 	background: transparent;
 	color: #F5F5F5;
 	border-style: solid;
@@ -436,12 +437,12 @@ QPushButton:hover{
 	border-color: #618DFA;
 }</string>
        </property>
-       <property name="spacing">
-        <number>0</number>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QListWidget" name="zonesList">
        <property name="font">
         <font>
@@ -471,12 +472,13 @@ QPushButton:hover{
       <widget class="QLabel" name="label_7">
        <property name="maximumSize">
         <size>
-         <width>150</width>
+         <width>130</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="font">
         <font>
+         <family>Segoe UI</family>
          <pointsize>12</pointsize>
          <weight>50</weight>
          <bold>false</bold>
@@ -493,9 +495,10 @@ QPushButton:hover{
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_8">
+      <widget class="QLabel" name="dwnPath_label">
        <property name="font">
         <font>
+         <family>Segoe UI Semilight</family>
          <pointsize>12</pointsize>
         </font>
        </property>
@@ -519,6 +522,7 @@ QPushButton:hover{
        </property>
        <property name="font">
         <font>
+         <family>Segoe UI</family>
          <pointsize>10</pointsize>
         </font>
        </property>
@@ -549,51 +553,11 @@ QPushButton:hover{
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="download_btn">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Segoe UI</family>
-       <pointsize>20</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{
-	background: transparent;
-	color: #F5F5F5;
-	border-style: solid;
-	border-width: 2px;
-	border-radius: 12px;
-	border-color: #F5F5F5;
-}
-
-QPushButton:hover{
-	
-	color: #618DFA;
-	border-color: #618DFA;
-}</string>
-     </property>
-     <property name="text">
-      <string>Выбрать загруженные</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton_2">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
+       <height>70</height>
       </size>
      </property>
      <property name="font">
@@ -676,7 +640,7 @@ QPushButton:hover{
       </widget>
      </item>
      <item row="1" column="0" colspan="2">
-      <widget class="QLabel" name="titleLabel_3">
+      <widget class="QLabel" name="info_label">
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -687,7 +651,8 @@ QPushButton:hover{
        </property>
        <property name="styleSheet">
         <string notr="true">QLabel{
-	color: #F5F5F5;
+	color: rgb(255, 6, 60)
+
 }</string>
        </property>
        <property name="text">
