@@ -1,5 +1,6 @@
 import os
 import re
+import time
 
 from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.uic import loadUi
@@ -190,16 +191,23 @@ class LoadDataWindow(QDialog):
                         api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
                         self.info_label.setVisible(True)
                         self.info_label.setText('Данные скачаны в {}', work_path + os.sep + download_path + os.sep + zone)
+                        time.sleep(4)
+                        print('Данные скачаны в {}',
+                                                work_path + os.sep + download_path + os.sep + zone)
                     except:
                         self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+                        print('Не удалось скачать данные для "{}"'.format(zone))
                 else:
                     os.makedirs(work_path + os.sep + download_path + os.sep + zone)
                     try:
                         api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
                         self.info_label.setVisible(True)
                         self.info_label.setText('Данные скачаны в {}', work_path + os.sep + download_path + os.sep + zone)
+                        print('Данные скачаны в {}',
+                              work_path + os.sep + download_path + os.sep + zone)
                     except:
                         self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+                        print('Не удалось скачать данные для "{}"'.format(zone))
 
 
 
