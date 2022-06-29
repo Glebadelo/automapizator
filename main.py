@@ -6,7 +6,7 @@ from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget, QTableWidgetItem, QHeaderView
-from PyQt5 import QtCore
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from sentinelsat import SentinelAPI
 from collections import OrderedDict
 
@@ -15,20 +15,20 @@ import resources_rc
 work_path = os.getcwd()
 
 #Список зон для запросов
-zonesKeys = ['Ob_reservoir', 'some_zone']
+zonesKeys = ['Ob_reservoir', 'Baikal_lake']
 
 
 #наборы тайлов
 Ob_reservoir = ('44UPF', '44UNF', '44UNE')
-some_zone = ('T44UPF', 'T44UNF', 'T44UNE')
+Baikal_lake = ('49UCB', '49UDB', '49UCA', '49UCV')
 
 #словарь названий со значением списка тайлов
 tiles = {}
 tiles['Ob_reservoir'] = Ob_reservoir
-tiles['some_zone'] = some_zone
+tiles['Baikal_lake'] = Baikal_lake
 
 
-zones = ('Обское водохранилище', 'Что-то там ещё') #список зон
+zones = ('Обское водохранилище', 'Озеро Байкал') #список зон
 
 
 address = 'https://scihub.copernicus.eu/dhus'
@@ -56,6 +56,52 @@ class MainWindow(QDialog):
     def openLDWindow(self):
         widget.setCurrentIndex(1)
 
+
+
+class downloadProducts(QThread):
+    def __init__(self, products, path, zone):
+        QThread.__init__(self)
+        self.products = products
+        self.path = path
+        self.zone = zone
+
+    def __del__(self):
+        self.wait()
+
+    def stop(self):
+        self.terminate()
+        self.exit()
+        self.quit()
+
+    def _download(self, products, path, zone):
+        if len(products) > 0:
+            if os.path.isdir(path):
+                try:
+                    api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
+                    time.sleep(2)
+                    print('Данные скачаны в {}',
+                          work_path + os.sep + download_path + os.sep + zone)
+                    loadDataWindow.info_label.setText('Данные скачаны в {}'.
+                                                      format(work_path + os.sep + download_path + os.sep + zone))
+                except:
+                    print('Не удалось скачать данные для "{}"'.format(zone))
+                    loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+            else:
+                os.makedirs(path)
+                try:
+                    api.download_all(products, directory_path=path,
+                                     max_attempts=5, checksum=True)
+                    loadDataWindow.info_label.setText('Данные скачаны в {}'.
+                                                      format(work_path + os.sep + download_path + os.sep + zone))
+                    print('Данные скачаны в {}',
+                          work_path + os.sep + download_path + os.sep + zone)
+                except:
+                    print('Не удалось скачать данные для "{}"'.format(zone))
+                    loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+
+    def run(self):
+        self._download(self.products, self.path, self.zone)
+
 checked_items = []
 class LoadDataWindow(QDialog):
     def __init__(self):
@@ -79,7 +125,6 @@ class LoadDataWindow(QDialog):
             self.info_label.setText(
                 'Ошибка в введёной дате, либо Ошибка подключения к сервису ESA, проверьте адресс, логин и пароль')
 
-
         # Заполнение списка зон
         for zone in zones:
             chkBox = self.LBItem(False)
@@ -92,11 +137,11 @@ class LoadDataWindow(QDialog):
     def LBItem(self, checked):
         # QtWidgets.QListWidgetItem.is
         item = QtWidgets.QListWidgetItem()
-        item.setFlags(QtCore.Qt.ItemIsEnabled)
+        item.setFlags(Qt.ItemIsEnabled)
         if checked:
-            item.setCheckState(QtCore.Qt.Checked)
+            item.setCheckState(Qt.Checked)
         else:
-            item.setCheckState(QtCore.Qt.Unchecked)
+            item.setCheckState(Qt.Unchecked)
         return item
 
     #Функция открытия карты
@@ -106,54 +151,165 @@ class LoadDataWindow(QDialog):
         except:
             pass
 
-
     #Функция вывода информации о зоне
     def zoneClicked(self):
         sender = self.sender()
         name = sender.currentItem().text() #текст выбранного элемента
         #print(sender.currentItem().checkState())
         if sender.currentItem().checkState() == 0: #если элемент был не отмечен
-            sender.currentItem().setCheckState(QtCore.Qt.Checked) #отметить
+            sender.currentItem().setCheckState(Qt.Checked) #отметить
             nTiles = tiles[zonesKeys[sender.row(sender.currentItem())]]
             info = '{} - {}'.format(name, nTiles) #строка информации
             checked_items.append(zonesKeys[sender.row(sender.currentItem())])
+            print(checked_items)
             self.zonesInfoList.appendPlainText(info)
         elif sender.currentItem().checkState() == 2: #если элемент был отмечен
-            sender.currentItem().setCheckState(QtCore.Qt.Unchecked) #снять отметку
-            for item in self.zonesInfoList.findItems(name, QtCore.Qt.MatchContains): #по тексту выбранного элепента находится совпадение в списке информации
-                self.zonesInfoList.takeItem(self.zonesInfoList.row(item)) # элемент удаляется
+            sender.currentItem().setCheckState(Qt.Unchecked) #снять отметку
             checked_items.remove(zonesKeys[sender.row(sender.currentItem())])
+            print(checked_items)
+
+            self.zonesInfoList.clear()
+            for item in checked_items:
+                print('---{}---'.format(item))
+                name = zones[zonesKeys.index(item)]
+                print(name)
+                #print(zonesKeys[item])
+                print(tiles[item])
+                nTiles = tiles[item]
+                print(nTiles)
+                info = '{} - {}'.format(name, nTiles)
+                self.zonesInfoList.appendPlainText(info)
+            # for item in self.zonesInfoList.findItems(name, Qt.MatchContains): #по тексту выбранного элепента находится совпадение в списке информации
+            #     self.zonesInfoList.takeItem(self.zonesInfoList.row(item)) # элемент удаляется
+
+
+
             #print('удалить')
         #print(sender.currentItem().checkState())
 
+    #функция возвращения на стартовое меню
     def returnToMW(self):
         widget.setCurrentIndex(0)
 
+
+    # def dateInfo(self):
+    #     QDateFrom = self.dateFrom.date()  # дата начала в QDate формате
+    #     dateFrom = re.sub("-", "", str(QDateFrom.toPyDate()))  # перевод QDate вид в yyyymmdd формат
+    #     print(dateFrom)
+    #
+    #     QDateTo = self.dateTo.date()
+    #     dateTo = re.sub("-", "", str(QDateTo.toPyDate()))
+    #     print(dateTo)
+    #
+    #     date = [dateFrom, dateTo]
+    #     return date
+    #
+    # def cloudInfo(self):
+    #     try:
+    #         cloudFrom = int(self.cloudFrom.text())  # значения облачности
+    #         cloudTo = int(self.cloudTo.text())
+    #     except:
+    #         cloudFrom = 0  # при пустых значениях устанавливаются значения по умолчанию
+    #         cloudTo = 94
+    #         # print(type(cloudFrom))
+    #     print(cloudFrom)
+    #     print(cloudTo)
+    #
+    #     cloud = [cloudFrom, cloudTo]
+    #     return cloud
+
+    # def zonesDownload(self, dict_query_kwargs):
+    #     for zone in checked_items:
+    #         print(zone)
+    #         for tile in tiles[zone]:
+    #             products = OrderedDict()
+    #             try:
+    #                 print(tile)
+    #                 kwg = dict_query_kwargs.copy()
+    #                 kwg['tileid'] = tile
+    #                 requests = api.query(**kwg)
+    #                 products.update(requests)
+    #                 print('--------')
+    #                 #self.info_label.setText()
+    #             except:
+    #                 self.info_label.setVisible(True)
+    #                 self.info_label.setText(
+    #                     'Ошибка в введёной дате, либо Ошибка подключения к сервису ESA, проверьте адресс, логин и пароль')
+    #             list_keys = list(products.keys())
+    #         print('Найдено сцен в количестве {}'.format(len(products)))
+    #         for elem in list_keys:
+    #             print(products[elem]['title'])
+    #             self.zonesInfoList.appendPlainText(products[elem]['title'])
+    #             prod_inf = [products, zone]
+    #         return prod_inf
+    #         #self.zoneDownload(products, zone)
+
+    # def zoneDownload(self, products, zone):
+    #     if len(products) > 0:
+    #         if os.path.isdir(work_path + os.sep + download_path + os.sep + zone):
+    #             try:
+    #                 api.download_all(products, directory_path=work_path + os.sep + download_path + os.sep + zone,
+    #                                  max_attempts=5, checksum=True)
+    #                 self.info_label.setVisible(True)
+    #                 self.info_label.setText(
+    #                     'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
+    #                 print('Данные скачаны в {}',
+    #                       work_path + os.sep + download_path + os.sep + zone)
+    #             except:
+    #                 self.info_label.setVisible(True)
+    #                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+    #                 print('Не удалось скачать данные для "{}"'.format(zone))
+    #         else:
+    #             os.makedirs(work_path + os.sep + download_path + os.sep + zone)
+    #             try:
+    #                 api.download_all(products, directory_path=work_path + os.sep + download_path + os.sep + zone,
+    #                                  max_attempts=5, checksum=True)
+    #                 self.info_label.setVisible(True)
+    #                 self.info_label.setText(
+    #                     'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
+    #                 print('Данные скачаны в {}',
+    #                       work_path + os.sep + download_path + os.sep + zone)
+    #             except:
+    #                 self.info_label.setVisible(True)
+    #                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+    #                 print('Не удалось скачать данные для "{}"'.format(zone))
+
+
+    #функция загрузки
     def download(self):
-        QDateFrom = self.dateFrom.date()
-        dateFrom = re.sub("-","", str(QDateFrom.toPyDate()))
+
+        self.info_label.setVisible(True)
+        self.info_label.setText('Идёт загрузка. Ожидайте')
+
+
+        #date = self.dateInfo()
+        self.download_btn.setEnabled(False)  # отключение кнопки загрузки
+        self.stop_btn.setEnabled(True)
+
+        QDateFrom = self.dateFrom.date() #дата начала в QDate формате
+        dateFrom = re.sub("-","", str(QDateFrom.toPyDate())) #перевод QDate вид в yyyymmdd формат
         print(dateFrom)
 
         QDateTo = self.dateTo.date()
         dateTo = re.sub("-","", str(QDateTo.toPyDate()))
         print(dateTo)
 
+        #cloud = self.cloudInfo()
         try:
-            cloudFrom = int(self.cloudFrom.text())
+            cloudFrom = int(self.cloudFrom.text()) #значения облачности
             cloudTo = int(self.cloudTo.text())
         except:
-            cloudFrom = 0
+            cloudFrom = 0 #при пустых значениях устанавливаются значения по умолчанию
             cloudTo = 94
-        print(type(cloudFrom))
+        #print(type(cloudFrom))
         print(cloudFrom)
         print(cloudTo)
-
 
         try:
             dict_query_kwargs = {'platformname': platform,  # словарь параметров для запроса
                                  'producttype': product_type,
-                                 'date': (dateFrom, dateTo)
-                                 #'cloudcoverpercentage': (cloudFrom, cloudTo)
+                                 'date': (dateFrom, dateTo),
+                                 'cloudcoverpercentage': (cloudFrom, cloudTo)
                                  }
         except:
             self.info_label.setVisible(True)
@@ -162,7 +318,16 @@ class LoadDataWindow(QDialog):
             print(
                 'Ошибка запроса данных на сервисе ESA, проверьте введённый интервал дат или имя спутника и тип продукта')
 
+        #prod_info = self.zonesDownload(dict_query_kwargs)
+        # self.info_label.setText('Идёт загрузка. Ожидайте')
+        # path = work_path + os.sep + download_path + os.sep + prod_info[1]
+        # self.downloadProduct = downloadProducts(prod_info[0], path, prod_info[1])
+        # self.downloadProduct.setTerminationEnabled(True)
+        # self.downloadProduct.start() #старт потока
 
+
+
+        #перебор выбранных зон для скачивания
         for zone in checked_items:
             print(zone)
             for tile in tiles[zone]:
@@ -184,17 +349,33 @@ class LoadDataWindow(QDialog):
             for elem in list_keys:
                 print(products[elem]['title'])
                 self.zonesInfoList.appendPlainText(products[elem]['title'])
+                time.sleep(1)
+
+            path = work_path + os.sep + download_path + os.sep + zone
+            try: #создание объекта класса загрузки файлов зоны
+
+                self.downloadProduct = downloadProducts(products, path, zone)
+                self.downloadProduct.setTerminationEnabled(True)
+                self.downloadProduct.start() #старт потока
+                self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
+            except:
+                self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+
+            self.info_label.setVisible(True)
+            self.info_label.setText(
+                'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
 
             if len(products) > 0:
                 if os.path.isdir(work_path + os.sep + download_path + os.sep + zone):
                     try:
                         api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
                         self.info_label.setVisible(True)
-                        self.info_label.setText('Данные скачаны в {}', work_path + os.sep + download_path + os.sep + zone)
+                        self.info_label.setText('Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
                         time.sleep(4)
                         print('Данные скачаны в {}',
                                                 work_path + os.sep + download_path + os.sep + zone)
                     except:
+                        self.info_label.setVisible(True)
                         self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
                         print('Не удалось скачать данные для "{}"'.format(zone))
                 else:
@@ -202,14 +383,23 @@ class LoadDataWindow(QDialog):
                     try:
                         api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
                         self.info_label.setVisible(True)
-                        self.info_label.setText('Данные скачаны в {}', work_path + os.sep + download_path + os.sep + zone)
+                        self.info_label.setText(
+                            'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
                         print('Данные скачаны в {}',
                               work_path + os.sep + download_path + os.sep + zone)
                     except:
+                        self.info_label.setVisible(True)
                         self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
                         print('Не удалось скачать данные для "{}"'.format(zone))
 
+    def stopDownload(self):
+        self.downloadProduct.stop()
+        self.downloadProduct.wait()
 
+    def done(self):
+        self.download_btn.setEnabled(True)  # отключение кнопки загрузки
+        self.stop_btn.setEnabled(False)
+        self.progressBar.setValue(0)
 
 if __name__ == "__main__":
     import sys

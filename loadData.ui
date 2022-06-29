@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>924</width>
-    <height>709</height>
+    <width>723</width>
+    <height>682</height>
    </rect>
   </property>
   <property name="cursor">
@@ -22,8 +22,8 @@
 	color: rgb(97, 141, 250);
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="back_btn">
@@ -74,7 +74,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QGridLayout" name="timeGrid">
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -267,7 +267,7 @@ QDateEdit::drop-down{
      </item>
     </layout>
    </item>
-   <item>
+   <item row="2" column="0">
     <layout class="QGridLayout" name="cloudGrid">
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
@@ -356,7 +356,7 @@ QDateEdit::drop-down{
      </item>
     </layout>
    </item>
-   <item>
+   <item row="3" column="0">
     <layout class="QGridLayout" name="zonesGrid">
      <item row="0" column="0">
       <widget class="QLabel" name="label_6">
@@ -419,6 +419,28 @@ QPushButton:hover{
        </property>
       </widget>
      </item>
+     <item row="2" column="0">
+      <widget class="QListWidget" name="zonesList">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QListWidget{
+	background: transparent;
+	color: #F5F5F5;
+	border-style: solid;
+	border-width: 3px;
+	border-radius: 10px;
+	border-color: #618DFA;
+}</string>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="1">
       <widget class="QPlainTextEdit" name="zonesInfoList">
        <property name="font">
@@ -442,31 +464,9 @@ QPushButton:hover{
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QListWidget" name="zonesList">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QListWidget{
-	background: transparent;
-	color: #F5F5F5;
-	border-style: solid;
-	border-width: 3px;
-	border-radius: 10px;
-	border-color: #618DFA;
-}</string>
-       </property>
-       <property name="spacing">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
-   <item>
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="pathGrid">
      <item>
       <widget class="QLabel" name="label_7">
@@ -520,6 +520,12 @@ QPushButton:hover{
          <height>30</height>
         </size>
        </property>
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -552,27 +558,31 @@ QPushButton:hover{
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QPushButton" name="download_btn">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>70</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Segoe UI</family>
-       <pointsize>20</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{
+   <item row="5" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="download_btn">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>70</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>20</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
 	background: transparent;
 	color: #F5F5F5;
 	border-style: solid;
@@ -587,40 +597,22 @@ QPushButton:hover{
 	color: #618DFA;
 	border-color: #618DFA;
 }</string>
-     </property>
-     <property name="text">
-      <string>Скачать сцены</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="progressGrid">
-     <item row="0" column="0">
-      <widget class="QProgressBar" name="progressBar">
+         </property>
+         <property name="text">
+          <string>Скачать сцены</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QPushButton" name="download_btn_2">
        <property name="minimumSize">
         <size>
-         <width>250</width>
-         <height>30</height>
+         <width>0</width>
+         <height>70</height>
         </size>
        </property>
-       <property name="font">
-        <font>
-         <family>Segoe UI</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QProgressBar{
-	color: #F5F5F5;
-}</string>
-       </property>
-       <property name="value">
-        <number>24</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="titleLabel_2">
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -629,22 +621,41 @@ QPushButton:hover{
          <bold>true</bold>
         </font>
        </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="styleSheet">
-        <string notr="true">QLabel{
+        <string notr="true">QPushButton{
+	background: transparent;
 	color: #F5F5F5;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 12px;
+	border-color: #F5F5F5;
+
+}
+
+QPushButton:hover{
+	
+	color: #618DFA;
+	border-color: #618DFA;
 }</string>
        </property>
        <property name="text">
-        <string>Успешно/Не успешно</string>
+        <string>Перенести</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0" colspan="2">
+    </layout>
+   </item>
+   <item row="6" column="0">
+    <layout class="QGridLayout" name="progressGrid">
+     <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="info_label">
        <property name="font">
         <font>
          <family>Segoe UI</family>
-         <pointsize>17</pointsize>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
