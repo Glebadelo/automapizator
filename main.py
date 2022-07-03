@@ -1,5 +1,7 @@
+import datetime
 import os
 import re
+import shutil
 import time
 
 from PyQt5.QtGui import QIntValidator, QIcon
@@ -9,6 +11,7 @@ from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget, QTableWidgetI
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from sentinelsat import SentinelAPI
 from collections import OrderedDict
+from datetime import date
 
 import resources_rc
 
@@ -58,6 +61,45 @@ class MainWindow(QDialog):
 
 
 
+class copyFiles(QThread):
+    def __init__(self):
+        QThread.__init__(self)
+
+
+    def stop(self):
+        self.terminate()
+        self.exit()
+        self.quit()
+
+    def __del__(self):
+        self.wait()
+
+    def copy(self):
+        loadDataWindow.info_label.setVisible(True)
+        print('Копирование в процессе...')
+        loadDataWindow.info_label.setText('Копирование в процессе...')
+        folders = os.listdir(work_path + os.sep + download_path)
+        print(folders)
+        a = str(datetime.date.today())
+        dateFolder = a.replace('-', '')
+        print(dateFolder)
+
+        if os.path.isdir('D:/folder/' + dateFolder):
+            for folder in folders:
+                files = os.listdir(work_path + os.sep + download_path + os.sep + folder)
+                for file in files:
+                    shutil.copy(work_path + os.sep + download_path + os.sep + folder + os.sep + file,
+                                'D:/folder/' + dateFolder)
+        else:
+            os.makedirs('D:/folder/' + dateFolder)
+            for folder in folders:
+                files = os.listdir(work_path + os.sep + download_path + os.sep + folder)
+                for file in files:
+                    shutil.copy(work_path + os.sep + download_path + os.sep + folder + os.sep + file,
+                                'D:/folder/' + dateFolder)
+        print('Копирование завершено')
+        loadDataWindow.info_label.setText('Завершено')
+
 class downloadProducts(QThread):
     def __init__(self, products, path, zone):
         QThread.__init__(self)
@@ -74,30 +116,38 @@ class downloadProducts(QThread):
         self.quit()
 
     def _download(self, products, path, zone):
+        loadDataWindow.download_btn.setEnabled(False)
         if len(products) > 0:
             if os.path.isdir(path):
                 try:
+                    loadDataWindow.info_label.setText('Данные загружаются. Ожидайте')
                     api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
-                    time.sleep(2)
+                    loadDataWindow.done()
                     print('Данные скачаны в {}',
                           work_path + os.sep + download_path + os.sep + zone)
                     loadDataWindow.info_label.setText('Данные скачаны в {}'.
-                                                      format(work_path + os.sep + download_path + os.sep + zone))
+                                                      format(work_path + os.sep + download_path))
+
                 except:
                     print('Не удалось скачать данные для "{}"'.format(zone))
                     loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
             else:
                 os.makedirs(path)
                 try:
+                    loadDataWindow.info_label.setText('Данные загружаются. Ожидайте')
                     api.download_all(products, directory_path=path,
                                      max_attempts=5, checksum=True)
+                    loadDataWindow.done()
                     loadDataWindow.info_label.setText('Данные скачаны в {}'.
-                                                      format(work_path + os.sep + download_path + os.sep + zone))
+                                                      format(work_path + os.sep + download_path))
                     print('Данные скачаны в {}',
                           work_path + os.sep + download_path + os.sep + zone)
+
                 except:
                     print('Не удалось скачать данные для "{}"'.format(zone))
                     loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+        loadDataWindow.download_btn.setEnabled(True)
+
 
     def run(self):
         self._download(self.products, self.path, self.zone)
@@ -111,6 +161,7 @@ class LoadDataWindow(QDialog):
         self.back_btn.clicked.connect(self.returnToMW)
         self.openMap_btn.clicked.connect(self.openMap)
         self.download_btn.clicked.connect(self.download)
+        self.copy_btn.clicked.connect(self.copy_files)
 
         self.info_label.setVisible(False) #скрытие информационной строки
         self.dwnPath_label.setText(work_path + os.sep + download_path) #вывод полного пути до каталога загрузки
@@ -275,16 +326,44 @@ class LoadDataWindow(QDialog):
     #                 print('Не удалось скачать данные для "{}"'.format(zone))
 
 
+
+    def copy_files(self):
+        self.info_label.setVisible(True)
+        print('Копирование в процессе...')
+        self.info_label.setText('Копирование в процессе...')
+        folders = os.listdir(work_path + os.sep + download_path)
+        print(folders)
+        a = str(datetime.date.today())
+        dateFolder = a.replace('-', '')
+        print(dateFolder)
+
+        if os.path.isdir('D:/folder/' + dateFolder):
+            for folder in folders:
+                files = os.listdir(work_path + os.sep + download_path + os.sep + folder)
+                for file in files:
+                    shutil.copy(work_path + os.sep + download_path + os.sep + folder + os.sep + file,
+                                'D:/folder/' + dateFolder)
+        else:
+            os.makedirs('D:/folder/' + dateFolder)
+            for folder in folders:
+                files = os.listdir(work_path + os.sep + download_path + os.sep + folder)
+                for file in files:
+                    shutil.copy(work_path + os.sep + download_path + os.sep + folder + os.sep + file,
+                                'D:/folder/' + dateFolder)
+        print('Копирование завершено')
+        self.info_label.setText('Копирование завершено')
+
+
     #функция загрузки
     def download(self):
 
         self.info_label.setVisible(True)
-        self.info_label.setText('Идёт загрузка. Ожидайте')
+        # self.info_label.setText('Идёт загрузка. Ожидайте')
 
 
         #date = self.dateInfo()
-        self.download_btn.setEnabled(False)  # отключение кнопки загрузки
-        self.stop_btn.setEnabled(True)
+        # self.download_btn.setEnabled(False)  # отключение кнопки загрузки
+        # self.stop_btn.setEnabled(True)
 
         QDateFrom = self.dateFrom.date() #дата начала в QDate формате
         dateFrom = re.sub("-","", str(QDateFrom.toPyDate())) #перевод QDate вид в yyyymmdd формат
@@ -325,8 +404,6 @@ class LoadDataWindow(QDialog):
         # self.downloadProduct.setTerminationEnabled(True)
         # self.downloadProduct.start() #старт потока
 
-
-
         #перебор выбранных зон для скачивания
         for zone in checked_items:
             print(zone)
@@ -353,7 +430,6 @@ class LoadDataWindow(QDialog):
 
             path = work_path + os.sep + download_path + os.sep + zone
             try: #создание объекта класса загрузки файлов зоны
-
                 self.downloadProduct = downloadProducts(products, path, zone)
                 self.downloadProduct.setTerminationEnabled(True)
                 self.downloadProduct.start() #старт потока
@@ -362,44 +438,42 @@ class LoadDataWindow(QDialog):
                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
             self.info_label.setVisible(True)
-            self.info_label.setText(
-                'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
+            # self.info_label.setText(
+            #     'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
 
-            if len(products) > 0:
-                if os.path.isdir(work_path + os.sep + download_path + os.sep + zone):
-                    try:
-                        api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
-                        self.info_label.setVisible(True)
-                        self.info_label.setText('Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
-                        time.sleep(4)
-                        print('Данные скачаны в {}',
-                                                work_path + os.sep + download_path + os.sep + zone)
-                    except:
-                        self.info_label.setVisible(True)
-                        self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
-                        print('Не удалось скачать данные для "{}"'.format(zone))
-                else:
-                    os.makedirs(work_path + os.sep + download_path + os.sep + zone)
-                    try:
-                        api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
-                        self.info_label.setVisible(True)
-                        self.info_label.setText(
-                            'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
-                        print('Данные скачаны в {}',
-                              work_path + os.sep + download_path + os.sep + zone)
-                    except:
-                        self.info_label.setVisible(True)
-                        self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
-                        print('Не удалось скачать данные для "{}"'.format(zone))
+            # if len(products) > 0:
+            #     if os.path.isdir(work_path + os.sep + download_path + os.sep + zone):
+            #         try:
+            #             api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
+            #             self.info_label.setVisible(True)
+            #             self.info_label.setText('Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
+            #             time.sleep(4)
+            #             print('Данные скачаны в {}',
+            #                                     work_path + os.sep + download_path + os.sep + zone)
+            #         except:
+            #             self.info_label.setVisible(True)
+            #             self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+            #             print('Не удалось скачать данные для "{}"'.format(zone))
+            #     else:
+            #         os.makedirs(work_path + os.sep + download_path + os.sep + zone)
+            #         try:
+            #             api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
+            #             self.info_label.setVisible(True)
+            #             self.info_label.setText(
+            #                 'Данные скачаны в {}'.format(work_path + os.sep + download_path + os.sep + zone))
+            #             print('Данные скачаны в {}',
+            #                   work_path + os.sep + download_path + os.sep + zone)
+            #         except:
+            #             self.info_label.setVisible(True)
+            #             self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+            #             print('Не удалось скачать данные для "{}"'.format(zone))
 
     def stopDownload(self):
         self.downloadProduct.stop()
         self.downloadProduct.wait()
 
     def done(self):
-        self.download_btn.setEnabled(True)  # отключение кнопки загрузки
-        self.stop_btn.setEnabled(False)
-        self.progressBar.setValue(0)
+        self.download_btn.setEnabled(True)
 
 if __name__ == "__main__":
     import sys
