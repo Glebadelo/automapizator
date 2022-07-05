@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1088</width>
-    <height>941</height>
+    <width>803</width>
+    <height>1067</height>
    </rect>
   </property>
   <property name="cursor">
@@ -22,7 +22,7 @@
 	color: rgb(97, 141, 250);
 }</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -39,13 +39,127 @@
          <height>40</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
        <property name="styleSheet">
         <string notr="true">QPushButton{
-	qproperty-icon: url(:/icons/icons/arrow-left-solid.svg);
+	background: transparent;
+	color: #F5F5F5;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 8px;
+	border-color: transparent;
+	image: url(:/icons/icons/arrow-left-solid.svg)
+
+}
+QPushButton:hover{
+	
+	color: #618DFA;
+	border-color: #618DFA;
+	
 }</string>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="help_btn">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: transparent;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 8px;
+	border-color: transparent;
+	image: url(:/icons/icons/question-solid.svg);
+
+}
+QPushButton:hover{
+	
+	color: #618DFA;
+	border-color: #618DFA;
+	
+}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="folder_btn">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+	background: transparent;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 8px;
+	border-color: transparent;
+	image: url(:/icons/icons/folder-solid.svg);
+
+}
+QPushButton:hover{
+	
+	color: #618DFA;
+	border-color: #618DFA;
+	
+}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -515,9 +629,15 @@ QPushButton:hover{
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
       <widget class="QCheckBox" name="geoTiff_CB">
+       <property name="maximumSize">
+        <size>
+         <width>210</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <family>Segoe UI</family>
@@ -534,7 +654,58 @@ QPushButton:hover{
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="RB_B8">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QRadioButton{
+	color: #F5F5F5;
+}</string>
+       </property>
+       <property name="text">
+        <string>B2,B3, B4, B8</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QRadioButton" name="RB_B11">
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QRadioButton{
+	color: #F5F5F5;
+}</string>
+       </property>
+       <property name="text">
+        <string>B2,B3, B4, B8, B11</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
       <widget class="QCheckBox" name="images_CB">
        <property name="enabled">
         <bool>false</bool>

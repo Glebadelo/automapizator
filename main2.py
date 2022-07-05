@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.uic import loadUi
@@ -51,8 +52,7 @@ class LoadDataWindow(QDialog):
         super(LoadDataWindow, self).__init__()
         path = resource_path('loadData.ui')
         loadUi(path, self)
-        self.back_btn.clicked.connect(self.returnToMW)
-        self.zonesList.itemChanged.connect(self.zoneSelected)
+        self.download_btn.clicked.connect(self.download)
 
 
         #Заполнение списка зон
@@ -96,20 +96,24 @@ class LoadDataWindow(QDialog):
         widget.setCurrentIndex(0)
 
     def download(self):
-        dateFrom = re.sub("-","", self.dateFrom.date())
-        dateTo = re.sub("-","", self.dateTo.date())
-        cloudFrom = self.cloudFrom.value()
-        cloudTo = self.cloudTo.value()
+        folders = os.listdir(os.getcwd() + os.sep + download_path)
+        for folder in folders:
 
-        try:
-            dict_query_kwargs = {'platformname': platform,  # словарь параметров для запроса
-                                 'producttype': product_type,
-                                 'date': (dateFrom, dateTo),
-                                 'cloudcoverpercentage': (cloudFrom, cloudTo)
-                                 }
-        except:
-            print(
-                'Ошибка запроса данных на сервисе ESA, проверьте введённый интервал дат или имя спутника и тип продукта')
+
+
+            filePath = os.getcwd() + os.sep + 'downloads' + os.sep + folder + os.sep
+            print(filePath)
+            scriptPath = os.getcwd() + os.sep + 'script' + os.sep + 's2_8432.xml'
+            print(scriptPath)
+            outputPath = os.getcwd() + os.sep + 'output' + os.sep
+            print(outputPath)
+            if os.system(
+                    r'for /r {0} %X in (*.zip) do (gpt {1} -Pinput1="%X" -Poutput1="{2}%~nX")'.format(
+                             filePath, scriptPath, outputPath)) == 0:
+                print('Преобразование файлов . продукта "{}" в GeoTIFF прошло успешно')
+
+
+
 
 
 

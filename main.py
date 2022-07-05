@@ -4,7 +4,7 @@ import re
 import shutil
 import time
 
-from PyQt5.QtGui import QIntValidator, QIcon
+from PyQt5.QtGui import QIntValidator, QIcon, QPixmap
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget, QTableWidgetItem, QHeaderView
@@ -12,8 +12,8 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from sentinelsat import SentinelAPI
 from collections import OrderedDict
 from datetime import date
-
 import resources_rc
+
 
 #Работа с конфигкрационным файлом
 
@@ -149,21 +149,11 @@ def create_list_settings(path):
             list_settings.append(get_tiles_config_SAD(path, 'Zones_tiles'))
             list_settings.append(get_settings_config_SAD(path, 'Settings_paths', 'path_downloads'))
             list_settings.append(get_settings_config_SAD(path, 'Settings_paths', 'path_archive'))
-
-            # address = get_settings_config_SAD(path, 'Settings_ESA', 'address', )
-            # login = get_settings_config_SAD(path, 'Settings_ESA', 'login', )
-            # password = get_settings_config_SAD(path, 'Settings_ESA', 'password', )
-            # platform = get_settings_config_SAD(path, 'Settings_ESA', 'platform')
-            # product_type = get_settings_config_SAD(path, 'Settings_ESA', 'product_type')
-            # tiles = get_tiles_config_SAD(path, 'Zones_tiles')
-            # download_path = get_settings_config_SAD(path, 'Settings_paths', 'path_downloads')
-            # path_archive = get_settings_config_SAD(path, 'Settings_paths', 'path_archive')
-
             print('Файл конфигурации {} успешно прочтён'.format(path))
-
         except:
             print(
                 'Ошибка конфигурации. Не удалось создать файл конфигурации, будут применены параметры по умолчанию')
+
 
 
 create_list_settings(work_path + os.sep + file_settings)
@@ -290,6 +280,34 @@ class downloadProducts(QThread):
                 except:
                     print('Не удалось скачать данные для "{}"'.format(zone))
                     loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+
+            if loadDataWindow.geoTiff_CB.checkState() == 2:
+                #folders = os.listdir(os.getcwd() + os.sep + download_path)
+                for folder in checked_items:
+                    print(folder)
+
+                    outputPath = os.getcwd() + os.sep + 'output' + os.sep + folder + os.sep
+                    print(outputPath)
+                    if os.path.isdir(outputPath) == False:
+                        os.makedirs(outputPath)
+
+                    filePath = os.getcwd() + os.sep + 'downloads' + os.sep + folder + os.sep
+                    print(filePath)
+
+                    if loadDataWindow.RB_B8.isChecked():
+                        scriptPath = os.getcwd() + os.sep + 'script' + os.sep + 's2_8432.xml'
+                        type = '_B2B3BB4B8'
+                    else:
+                        scriptPath = os.getcwd() + os.sep + 'script' + os.sep + 's2_bands_resample.xml'
+                        type = '_B2B3BB4B8B11'
+                    print(scriptPath)
+
+                    loadDataWindow.info_label.setText('Процесс преобразования файлов в GeoTIFF запущен')
+                    if os.system(
+                            r'for /r {0} %X in (*.zip) do (gpt {1} -Pinput1="%X" -Poutput1="{2}%~nX{3}")'.format(
+                                filePath, scriptPath, outputPath, type)) == 0:
+                        print('Преобразование файлов в GeoTIFF прошло успешно')
+                        loadDataWindow.info_label.setText('Преобразование файлов в GeoTIFF прошло успешно')
         loadDataWindow.download_btn.setEnabled(True)
         loadDataWindow.copy_btn.setEnabled(True)
 
@@ -311,6 +329,10 @@ class LoadDataWindow(QDialog):
 
         self.info_label.setVisible(False) #скрытие информационной строки
         self.dwnPath_label.setText(work_path + os.sep + download_path) #вывод полного пути до каталога загрузки
+
+        self.help_btn.setIcon(QIcon(QPixmap('icons/question-solid.svg')))
+        self.back_btn.setIcon(QIcon(QPixmap('icons/arrow-left-solid.svg')))
+        self.folder_btn.setIcon(QIcon(QPixmap('icons/folder-solid.svg')))
 
         #Подключение к сервису ESA
         global api
@@ -336,9 +358,17 @@ class LoadDataWindow(QDialog):
         sender = self.sender()
         if sender.checkState() == 2:
             self.images_CB.setEnabled(True)
+            self.RB_B8.setCheckable(True)
+            self.RB_B11.setCheckable(True)
+            self.RB_B8.setChecked(True)
         else:
             self.images_CB.setEnabled(False)
             self.images_CB.setCheckState(0)
+            #Убрать возможность выбирать радио и снять с них выбор
+            self.RB_B8.setCheckable(False)
+            self.RB_B11.setCheckable(False)
+            self.RB_B8.setChecked(True)
+            self.RB_B11.setChecked(False)
 
 
     # Создание чекбокса в листбоксе

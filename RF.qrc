@@ -3,6 +3,8 @@
     <file>logoPlaneta.png</file>
   </qresource>
   <qresource prefix="icons">
+    <file>icons/folder-solid.svg</file>
+    <file>icons/question-solid.svg</file>
     <file>icons/arrow-left-solid.svg</file>
     <file>icons/caret-down-solid.svg</file>
     <file>icons/square-caret-down-regular.svg</file>
