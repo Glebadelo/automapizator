@@ -26,54 +26,6 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="back_btn">
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>40</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton{
-	background: transparent;
-	color: #F5F5F5;
-	border-style: solid;
-	border-width: 2px;
-	border-radius: 8px;
-	border-color: transparent;
-	image: url(:/icons/icons/arrow-left-solid.svg)
-
-}
-QPushButton:hover{
-	
-	color: #618DFA;
-	border-color: #618DFA;
-	
-}</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>30</width>
-         <height>30</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="help_btn">
        <property name="minimumSize">
         <size>

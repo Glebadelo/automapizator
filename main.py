@@ -4,7 +4,7 @@ import re
 import shutil
 import time
 
-from PyQt5.QtGui import QIntValidator, QIcon, QPixmap
+from PyQt5.QtGui import QIntValidator, QIcon, QPixmap, QPainter, QColor
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget, QTableWidgetItem, QHeaderView
@@ -181,18 +181,16 @@ def resource_path(relative):
         return os.path.join(sys._MEIPASS, relative)
     return os.path.join(relative)
 
-class MainWindow(QDialog):
-
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        path = resource_path('MainWindow.ui')
-        loadUi(path, self)
-        self.LDWindow_btn.clicked.connect(self.openLDWindow)
-
-    def openLDWindow(self):
-        widget.setCurrentIndex(1)
-
-
+# class MainWindow(QDialog):
+#
+#     def __init__(self):
+#         super(MainWindow, self).__init__()
+#         path = resource_path('MainWindow.ui')
+#         loadUi(path, self)
+#         self.LDWindow_btn.clicked.connect(self.openLDWindow)
+#
+#     def openLDWindow(self):
+#         widget.setCurrentIndex(1)
 
 class copyFiles(QThread):
     def __init__(self):
@@ -254,6 +252,8 @@ class downloadProducts(QThread):
         if len(products) > 0:
             if os.path.isdir(path):
                 try:
+                    loadDataWindow.info_label.setText("")
+                    loadDataWindow.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                     loadDataWindow.info_label.setText('Данные загружаются. Ожидайте')
                     api.download_all(products, directory_path = work_path + os.sep + download_path + os.sep + zone, max_attempts=5, checksum=True)
                     loadDataWindow.done()
@@ -263,11 +263,13 @@ class downloadProducts(QThread):
                                                       format(work_path + os.sep + download_path))
 
                 except:
+                    loadDataWindow.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                     print('Не удалось скачать данные для "{}"'.format(zone))
                     loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
             else:
                 os.makedirs(path)
                 try:
+                    loadDataWindow.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                     loadDataWindow.info_label.setText('Данные загружаются. Ожидайте')
                     api.download_all(products, directory_path=path,
                                      max_attempts=5, checksum=True)
@@ -278,6 +280,7 @@ class downloadProducts(QThread):
                           work_path + os.sep + download_path + os.sep + zone)
 
                 except:
+                    loadDataWindow.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                     print('Не удалось скачать данные для "{}"'.format(zone))
                     loadDataWindow.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
@@ -302,6 +305,7 @@ class downloadProducts(QThread):
                         type = '_B2B3BB4B8B11'
                     print(scriptPath)
 
+                    loadDataWindow.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                     loadDataWindow.info_label.setText('Процесс преобразования файлов в GeoTIFF запущен')
                     if os.system(
                             r'for /r {0} %X in (*.zip) do (gpt {1} -Pinput1="%X" -Poutput1="{2}%~nX{3}")'.format(
@@ -321,17 +325,36 @@ class LoadDataWindow(QDialog):
         super(LoadDataWindow, self).__init__()
         path = resource_path('loadData.ui')
         loadUi(path, self)
-        self.back_btn.clicked.connect(self.returnToMW)
+        # Подключение метода к событиям клика по кнопке
         self.openMap_btn.clicked.connect(self.openMap)
         self.download_btn.clicked.connect(self.download)
         self.copy_btn.clicked.connect(self.copy_files)
         self.geoTiff_CB.stateChanged.connect(self.imageCB)
 
+        self.cloudFrom.setValidator(QIntValidator(0, 99)) # Установил ограничение на ввод только чисел от 0 до 99
+        self.cloudTo.setValidator(QIntValidator(0, 99))
+
+
+        self.dateTo.setDate(datetime.datetime.now().date())
+        dt = self.dateTo.date()
+        self.dateFrom.setDate(dt.addDays(-1))
+
         self.info_label.setVisible(False) #скрытие информационной строки
         self.dwnPath_label.setText(work_path + os.sep + download_path) #вывод полного пути до каталога загрузки
 
+        self.folder_btn.clicked.connect(self.openFolder)
+
+
+        # QP1 = QPixmap('icons/question-solid.svg')
+        # Qpain = QPainter(QP1)
+        # Qpain.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        # color = QColor.fromRgba64(97, 141, 250, 98)
+        # Qpain.setBrush(color)
+        # Qpain.setPen(color)
+        # Qpain.drawRect(QP1.rect())
+        # self.help_btn.setIcon(QIcon(QP1))
+
         self.help_btn.setIcon(QIcon(QPixmap('icons/question-solid.svg')))
-        self.back_btn.setIcon(QIcon(QPixmap('icons/arrow-left-solid.svg')))
         self.folder_btn.setIcon(QIcon(QPixmap('icons/folder-solid.svg')))
 
         #Подключение к сервису ESA
@@ -353,6 +376,9 @@ class LoadDataWindow(QDialog):
         self.zonesList.itemClicked.connect(self.zoneClicked) #событие нажатия элемента списка зон
 
 
+
+    def openFolder(self):
+        os.startfile(work_path)
 
     def imageCB(self):
         sender = self.sender()
@@ -429,6 +455,7 @@ class LoadDataWindow(QDialog):
         widget.setCurrentIndex(0)
 
     def copy_files(self):
+        self.info_label.setText("")
         self.info_label.setVisible(True)
         try:
             zones = os.listdir(work_path + os.sep + download_path)
@@ -441,6 +468,7 @@ class LoadDataWindow(QDialog):
                 for zone in zones:
                     files = os.listdir(work_path + os.sep + download_path + os.sep + zone)
                     for file in files:
+                        self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                         print('Копирование в процессе...')
                         self.info_label.setText('Копирование в процессе...')
                         shutil.copy(work_path + os.sep + download_path + os.sep + zone + os.sep + file,
@@ -450,19 +478,22 @@ class LoadDataWindow(QDialog):
                 for zone in zones:
                     files = os.listdir(work_path + os.sep + download_path + os.sep + zone)
                     for file in files:
+                        self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                         print('Копирование в процессе...')
                         self.info_label.setText('Копирование в процессе...')
                         shutil.copy(work_path + os.sep + download_path + os.sep + zone + os.sep + file,
                                     path)
             print('Копирование завершено')
+            self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
             self.info_label.setText('Копирование завершено')
         except FileNotFoundError:
+            self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
             self.info_label.setText('Сначала загрузите данные, для создания нужных каталогов')
 
 
     #функция загрузки
     def download(self):
-
+        self.info_label.setText("")
         self.info_label.setVisible(True)
         # self.info_label.setText('Идёт загрузка. Ожидайте')
 
@@ -496,6 +527,7 @@ class LoadDataWindow(QDialog):
                                  'cloudcoverpercentage': (cloudFrom, cloudTo)
                                  }
         except:
+            self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
             self.info_label.setVisible(True)
             self.info_label.setText(
                 'Ошибка запроса данных на сервисе ESA, проверьте введённый интервал дат или имя спутника и тип продукта')
@@ -523,6 +555,7 @@ class LoadDataWindow(QDialog):
                     print('--------')
                     #self.info_label.setText()
                 except:
+                    self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                     self.info_label.setVisible(True)
                     self.info_label.setText(
                         'Ошибка в введёной дате, либо Ошибка подключения к сервису ESA, проверьте адресс, логин и пароль')
@@ -540,6 +573,7 @@ class LoadDataWindow(QDialog):
                 self.downloadProduct.start() #старт потока
                 self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
             except:
+                self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
             self.info_label.setVisible(True)
@@ -586,8 +620,8 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = QStackedWidget()
 
-    mainWindow = MainWindow()
-    widget.addWidget(mainWindow)
+    # mainWindow = MainWindow()
+    # widget.addWidget(mainWindow)
 
     loadDataWindow = LoadDataWindow()
     widget.addWidget(loadDataWindow)
