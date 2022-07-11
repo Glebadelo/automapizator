@@ -16,7 +16,7 @@ if __name__ == "__main__":
         api = SentinelAPI('helga1289', 'gordeeva120689', 'https://scihub.copernicus.eu/dhus')
 
 
-        tiles = ['T44UPF', 'T44UNF', 'T44UNE']
+        tiles = ['T44UPF', 'T44UNF']
         kwg = {'platformname': 'Sentinel-2',  # словарь параметров для запроса
                 'producttype': 'S2MSI1C',
                 'date': ('NOW-14DAYS', 'NOW')

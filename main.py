@@ -289,7 +289,7 @@ class downloadProducts(QThread):
                 for folder in checked_items:
                     print(folder)
 
-                    outputPath = os.getcwd() + os.sep + 'output' + os.sep + folder + os.sep
+                    outputPath = os.getcwd() + os.sep + 'outputTIFF' + os.sep + folder + os.sep
                     print(outputPath)
                     if os.path.isdir(outputPath) == False:
                         os.makedirs(outputPath)
@@ -314,6 +314,24 @@ class downloadProducts(QThread):
                         loadDataWindow.info_label.setText('Преобразование файлов в GeoTIFF прошло успешно')
         loadDataWindow.download_btn.setEnabled(True)
         loadDataWindow.copy_btn.setEnabled(True)
+
+        if loadDataWindow.images_CB.checkState() == 2:
+            loadDataWindow.download_btn.setEnabled(False)
+            loadDataWindow.copy_btn.setEnabled(False)
+            self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
+            loadDataWindow.info_label.setText('Процесс создания изображения запущен')
+
+            arcpy = os.getcwd() + os.sep + 'ArcGIS10.6' + os.sep + 'python.exe'
+            acrmap_create_maps = os.getcwd() + os.sep + 'arcmap_create_maps-res.py'
+            if os.system(r'{0} {1}'.format(arcpy, acrmap_create_maps)) == 0:
+                print('Создание изображений прошло успешно')
+                self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
+                loadDataWindow.info_label.setText('Создание изображений прошло успешно')
+
+
+            loadDataWindow.download_btn.setEnabled(True)
+            loadDataWindow.copy_btn.setEnabled(True)
+
 
 
     def run(self):
@@ -383,13 +401,13 @@ class LoadDataWindow(QDialog):
     def imageCB(self):
         sender = self.sender()
         if sender.checkState() == 2:
-            self.images_CB.setEnabled(True)
+            # self.images_CB.setEnabled(True)
             self.RB_B8.setCheckable(True)
             self.RB_B11.setCheckable(True)
             self.RB_B8.setChecked(True)
         else:
-            self.images_CB.setEnabled(False)
-            self.images_CB.setCheckState(0)
+            # self.images_CB.setEnabled(False)
+            # self.images_CB.setCheckState(0)
             #Убрать возможность выбирать радио и снять с них выбор
             self.RB_B8.setCheckable(False)
             self.RB_B11.setCheckable(False)
@@ -544,10 +562,11 @@ class LoadDataWindow(QDialog):
         #перебор выбранных зон для скачивания
         for zone in checked_items:
             print('Зона - {}'.format(zone))
+            print(tiles[checked_items.index(zone)])
+            products = OrderedDict()
             for tile in tiles[checked_items.index(zone)]:
-                products = OrderedDict()
+                print(tile)
                 try:
-                    print(tile)
                     kwg = dict_query_kwargs.copy()
                     kwg['tileid'] = tile
                     requests = api.query(**kwg)
@@ -564,7 +583,6 @@ class LoadDataWindow(QDialog):
             for elem in list_keys:
                 print(products[elem]['title'])
                 self.zonesInfoList.appendPlainText(products[elem]['title'])
-                time.sleep(1)
 
             path = work_path + os.sep + download_path + os.sep + zone
             try: #создание объекта класса загрузки файлов зоны
@@ -575,6 +593,19 @@ class LoadDataWindow(QDialog):
             except:
                 self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+            # for elem in list_keys:
+            #     print(products[elem]['title'])
+            #     self.zonesInfoList.appendPlainText(products[elem]['title'])
+            #
+            # path = work_path + os.sep + download_path + os.sep + zone
+            # try: #создание объекта класса загрузки файлов зоны
+            #     self.downloadProduct = downloadProducts(products, path, zone)
+            #     self.downloadProduct.setTerminationEnabled(True)
+            #     self.downloadProduct.start() #старт потока
+            #     self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
+            # except:
+            #     self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
+            #     self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
             self.info_label.setVisible(True)
             # self.info_label.setText(

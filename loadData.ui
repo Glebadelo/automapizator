@@ -660,7 +660,7 @@ QPushButton:hover{
      <item row="1" column="0" colspan="2">
       <widget class="QCheckBox" name="images_CB">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="font">
         <font>
