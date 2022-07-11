@@ -361,6 +361,7 @@ class LoadDataWindow(QDialog):
         self.dwnPath_label.setText(work_path + os.sep + download_path) #вывод полного пути до каталога загрузки
 
         self.folder_btn.clicked.connect(self.openFolder)
+        self.help_btn.clicked.connect(self.openManual)
 
 
         # QP1 = QPixmap('icons/question-solid.svg')
@@ -394,6 +395,9 @@ class LoadDataWindow(QDialog):
         self.zonesList.itemClicked.connect(self.zoneClicked) #событие нажатия элемента списка зон
 
 
+
+    def openManual(self):
+        os.startfile(os.getcwd() + os.sep + 'Инструкция.docx')
 
     def openFolder(self):
         os.startfile(work_path)
