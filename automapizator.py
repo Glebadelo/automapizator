@@ -2,13 +2,14 @@ import datetime
 import os
 import re
 import shutil
+import ctypes
 import time
 
-from PyQt5.QtGui import QIntValidator, QIcon, QPixmap, QPainter, QColor
+from PyQt5.QtGui import QIntValidator, QIcon, QPixmap
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget, QTableWidgetItem, QHeaderView
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize
 from sentinelsat import SentinelAPI
 from collections import OrderedDict
 from datetime import date
@@ -318,14 +319,16 @@ class downloadProducts(QThread):
         if loadDataWindow.images_CB.checkState() == 2:
             loadDataWindow.download_btn.setEnabled(False)
             loadDataWindow.copy_btn.setEnabled(False)
-            self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
+            loadDataWindow.info_label.setVisible(True)
+            loadDataWindow.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
+
             loadDataWindow.info_label.setText('Процесс создания изображения запущен')
 
             arcpy = os.getcwd() + os.sep + 'ArcGIS10.6' + os.sep + 'python.exe'
             acrmap_create_maps = os.getcwd() + os.sep + 'arcmap_create_maps-res.py'
             if os.system(r'{0} {1}'.format(arcpy, acrmap_create_maps)) == 0:
                 print('Создание изображений прошло успешно')
-                self.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
+                loadDataWindow.info_label.setStyleSheet("color: rgba(71, 230, 98, 90)")
                 loadDataWindow.info_label.setText('Создание изображений прошло успешно')
 
 
@@ -342,6 +345,7 @@ class LoadDataWindow(QDialog):
     def __init__(self):
         super(LoadDataWindow, self).__init__()
         path = resource_path('loadData.ui')
+        self.setWindowTitle("My Window")
         loadUi(path, self)
         # Подключение метода к событиям клика по кнопке
         self.openMap_btn.clicked.connect(self.openMap)
@@ -597,19 +601,20 @@ class LoadDataWindow(QDialog):
             except:
                 self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
-            # for elem in list_keys:
-            #     print(products[elem]['title'])
-            #     self.zonesInfoList.appendPlainText(products[elem]['title'])
-            #
-            # path = work_path + os.sep + download_path + os.sep + zone
-            # try: #создание объекта класса загрузки файлов зоны
-            #     self.downloadProduct = downloadProducts(products, path, zone)
-            #     self.downloadProduct.setTerminationEnabled(True)
-            #     self.downloadProduct.start() #старт потока
-            #     self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
-            # except:
-            #     self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
-            #     self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
+
+        # for elem in list_keys:
+        #     print(products[elem]['title'])
+        #     self.zonesInfoList.appendPlainText(products[elem]['title'])
+        #
+        # path = work_path + os.sep + download_path + os.sep + zone
+        # try: #создание объекта класса загрузки файлов зоны
+        #      self.downloadProduct = downloadProducts(products, path, zone)
+        #      self.downloadProduct.setTerminationEnabled(True)
+        #      self.downloadProduct.start() #старт потока
+        #      self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
+        # except:
+        #     self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
+        #     self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
             self.info_label.setVisible(True)
             # self.info_label.setText(
@@ -652,7 +657,23 @@ class LoadDataWindow(QDialog):
 if __name__ == "__main__":
     import sys
 
+    myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+
     app = QApplication(sys.argv)
+
+    app_icon = QIcon()
+    app_icon.addFile('logoPlaneta.ico', QSize(16, 16))
+    app_icon.addFile('logoPlaneta.ico', QSize(24, 24))
+    app_icon.addFile('logoPlaneta.ico', QSize(32, 32))
+    app_icon.addFile('logoPlaneta.ico', QSize(48, 48))
+    app_icon.addFile('logoPlaneta.ico', QSize(256, 256))
+
+
+
+    app.setWindowIcon(app_icon)
+
     widget = QStackedWidget()
 
     # mainWindow = MainWindow()
