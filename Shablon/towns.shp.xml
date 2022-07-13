@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="ru"><Esri><CreaDate>20220713</CreaDate><CreaTime>13302800</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="c:\program files (x86)\arcgis\desktop10.5\ArcToolbox\Toolboxes\Data Management Tools.tbx\CalculateField" Date="20181008" Time="162700">CalculateField СФО\SFO_town NAME !NAME!.upper() PYTHON_9.3 #</Process></lineage></DataProperties></Esri></metadata>
