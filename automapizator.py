@@ -15,9 +15,7 @@ from collections import OrderedDict
 from datetime import date
 import resources_rc
 
-
 #Работа с конфигкрационным файлом
-
 try:                                                                   # Модуль для работы с файлами конфигурации
     import configparser
 except ImportError:
@@ -29,7 +27,6 @@ file_settings = r'Config.ini'
 
 #Список зон для запросов
 zonesKeys = ['Ob_reservoir', 'Baikal_lake']
-
 
 #наборы тайлов
 #Ob_reservoir = ('44UPF', '44UNF', '44UNE')
@@ -44,10 +41,7 @@ for zone in zonesKeys:
     zoneTiles[zone] = tiles[zonesKeys.index(zone)]
 print(zoneTiles)
 
-
-
 zones = ('Обское водохранилище', 'Озеро Байкал') #список зон
-
 
 address = 'https://scihub.copernicus.eu/dhus'
 login = 'helga1289'
@@ -58,7 +52,6 @@ download_path = 'downloads'
 path_archive = 'D:/PycharmProjects/automapizator/folder'
 
 list_settings = []
-
 
 def create_config_SAD(path):
     """Функция создания файла конфигурации,
@@ -94,11 +87,9 @@ def create_config_SAD(path):
     except:
         print('Ошибка создания файла конфигурации. Не удалось создать файл конфигурации')
 
-
 def get_config_SAD(path):
     '''Функция получения объекта файла конфигурации
     '''
-
     try:
         if not os.path.exists(path):  # если файл конфигурации не найден,
             create_config_SAD(path)  # то файл конфигурации создатся, используя настройки по умолчанию
@@ -107,10 +98,8 @@ def get_config_SAD(path):
         config.read(path)  # считываем файл конфигурации
 
         return config
-
     except:
         print('Ошибка доступа к файлу конфигурации')
-
 
 def get_settings_config_SAD(path, section, settings):
     '''Функция получения информации из опций файла конфигурации
@@ -155,8 +144,6 @@ def create_list_settings(path):
             print(
                 'Ошибка конфигурации. Не удалось создать файл конфигурации, будут применены параметры по умолчанию')
 
-
-
 create_list_settings(work_path + os.sep + file_settings)
 address = list_settings[0]
 login = list_settings[1]
@@ -175,7 +162,6 @@ zoneTiles = {}
 for zone in zonesKeys:
     zoneTiles[zone] = tiles[zonesKeys.index(zone)]
 print(zoneTiles)
-
 
 def resource_path(relative):
     if hasattr(sys, "_MEIPASS"):
@@ -196,7 +182,6 @@ def resource_path(relative):
 class copyFiles(QThread):
     def __init__(self):
         QThread.__init__(self)
-
 
     def stop(self):
         self.terminate()
@@ -262,7 +247,6 @@ class downloadProducts(QThread):
                           work_path + os.sep + download_path + os.sep + zone)
                     loadDataWindow.info_label.setText('Данные скачаны в {}'.
                                                       format(work_path + os.sep + download_path))
-
                 except:
                     loadDataWindow.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                     print('Не удалось скачать данные для "{}"'.format(zone))
@@ -289,7 +273,6 @@ class downloadProducts(QThread):
                 #folders = os.listdir(os.getcwd() + os.sep + download_path)
                 for folder in checked_items:
                     print(folder)
-
                     outputPath = os.getcwd() + os.sep + 'outputTIFF' + os.sep + folder + os.sep
                     print(outputPath)
                     if os.path.isdir(outputPath) == False:
@@ -313,8 +296,6 @@ class downloadProducts(QThread):
                                 filePath, scriptPath, outputPath, type)) == 0:
                         print('Преобразование файлов в GeoTIFF прошло успешно')
                         loadDataWindow.info_label.setText('Преобразование файлов в GeoTIFF прошло успешно')
-        loadDataWindow.download_btn.setEnabled(True)
-        loadDataWindow.copy_btn.setEnabled(True)
 
         if loadDataWindow.images_CB.checkState() == 2:
             loadDataWindow.download_btn.setEnabled(False)
@@ -335,8 +316,6 @@ class downloadProducts(QThread):
             loadDataWindow.download_btn.setEnabled(True)
             loadDataWindow.copy_btn.setEnabled(True)
 
-
-
     def run(self):
         self._download(self.products, self.path, self.zone)
 
@@ -356,7 +335,6 @@ class LoadDataWindow(QDialog):
         self.cloudFrom.setValidator(QIntValidator(0, 99)) # Установил ограничение на ввод только чисел от 0 до 99
         self.cloudTo.setValidator(QIntValidator(0, 99))
 
-
         self.dateTo.setDate(datetime.datetime.now().date())
         dt = self.dateTo.date()
         self.dateFrom.setDate(dt.addDays(-1))
@@ -366,16 +344,6 @@ class LoadDataWindow(QDialog):
 
         self.folder_btn.clicked.connect(self.openFolder)
         self.help_btn.clicked.connect(self.openManual)
-
-
-        # QP1 = QPixmap('icons/question-solid.svg')
-        # Qpain = QPainter(QP1)
-        # Qpain.setCompositionMode(QPainter.CompositionMode_SourceIn)
-        # color = QColor.fromRgba64(97, 141, 250, 98)
-        # Qpain.setBrush(color)
-        # Qpain.setPen(color)
-        # Qpain.drawRect(QP1.rect())
-        # self.help_btn.setIcon(QIcon(QP1))
 
         self.help_btn.setIcon(QIcon(QPixmap('icons/question-solid.svg')))
         self.folder_btn.setIcon(QIcon(QPixmap('icons/folder-solid.svg')))
@@ -398,8 +366,6 @@ class LoadDataWindow(QDialog):
 
         self.zonesList.itemClicked.connect(self.zoneClicked) #событие нажатия элемента списка зон
 
-
-
     def openManual(self):
         os.startfile(os.getcwd() + os.sep + 'Инструкция.docx')
 
@@ -409,23 +375,17 @@ class LoadDataWindow(QDialog):
     def imageCB(self):
         sender = self.sender()
         if sender.checkState() == 2:
-            # self.images_CB.setEnabled(True)
             self.RB_B8.setCheckable(True)
             self.RB_B11.setCheckable(True)
             self.RB_B8.setChecked(True)
         else:
-            # self.images_CB.setEnabled(False)
-            # self.images_CB.setCheckState(0)
-            #Убрать возможность выбирать радио и снять с них выбор
             self.RB_B8.setCheckable(False)
             self.RB_B11.setCheckable(False)
             self.RB_B8.setChecked(True)
             self.RB_B11.setChecked(False)
 
-
     # Создание чекбокса в листбоксе
     def LBItem(self, checked):
-        # QtWidgets.QListWidgetItem.is
         item = QtWidgets.QListWidgetItem()
         item.setFlags(Qt.ItemIsEnabled)
         if checked:
@@ -458,27 +418,15 @@ class LoadDataWindow(QDialog):
             sender.currentItem().setCheckState(Qt.Unchecked) #снять отметку
             checked_items.remove(zonesKeys[sender.row(sender.currentItem())])
             print(checked_items)
-
-            self.zonesInfoList.clear()
-            for item in checked_items:
+            self.zonesInfoList.clear() #очистка информационного списка
+            for item in checked_items: # заполнение списка выбранными элементами
                 print('---{}---'.format(item))
                 name = zones[zonesKeys.index(item)].replace('_', ' ')
                 print(name)
-                #print(zonesKeys[item])
-                #print(tiles[checked_items.index(item)])
                 nTiles = tiles[zonesKeys.index(item)]
                 print(nTiles)
                 info = '{} - {}'.format(name, nTiles)
                 self.zonesInfoList.appendPlainText(info)
-            # for item in self.zonesInfoList.findItems(name, Qt.MatchContains): #по тексту выбранного элепента находится совпадение в списке информации
-            #     self.zonesInfoList.takeItem(self.zonesInfoList.row(item)) # элемент удаляется
-
-            #print('удалить')
-        #print(sender.currentItem().checkState())
-
-    #функция возвращения на стартовое меню
-    def returnToMW(self):
-        widget.setCurrentIndex(0)
 
     def copy_files(self):
         self.info_label.setText("")
@@ -516,16 +464,10 @@ class LoadDataWindow(QDialog):
             self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
             self.info_label.setText('Сначала загрузите данные, для создания нужных каталогов')
 
-
     #функция загрузки
     def download(self):
         self.info_label.setText("")
         self.info_label.setVisible(True)
-        # self.info_label.setText('Идёт загрузка. Ожидайте')
-
-        #date = self.dateInfo()
-        # self.download_btn.setEnabled(False)  # отключение кнопки загрузки
-        # self.stop_btn.setEnabled(True)
 
         QDateFrom = self.dateFrom.date() #дата начала в QDate формате
         dateFrom = re.sub("-","", str(QDateFrom.toPyDate())) #перевод QDate вид в yyyymmdd формат
@@ -535,14 +477,12 @@ class LoadDataWindow(QDialog):
         dateTo = re.sub("-","", str(QDateTo.toPyDate()))
         print(dateTo)
 
-        #cloud = self.cloudInfo()
         try:
             cloudFrom = int(self.cloudFrom.text()) #значения облачности
             cloudTo = int(self.cloudTo.text())
         except:
             cloudFrom = 0 #при пустых значениях устанавливаются значения по умолчанию
             cloudTo = 94
-        #print(type(cloudFrom))
         print(cloudFrom)
         print(cloudTo)
 
@@ -560,19 +500,12 @@ class LoadDataWindow(QDialog):
             print(
                 'Ошибка запроса данных на сервисе ESA, проверьте введённый интервал дат или имя спутника и тип продукта')
 
-        #prod_info = self.zonesDownload(dict_query_kwargs)
-        # self.info_label.setText('Идёт загрузка. Ожидайте')
-        # path = work_path + os.sep + download_path + os.sep + prod_info[1]
-        # self.downloadProduct = downloadProducts(prod_info[0], path, prod_info[1])
-        # self.downloadProduct.setTerminationEnabled(True)
-        # self.downloadProduct.start() #старт потока
-
         #перебор выбранных зон для скачивания
         for zone in checked_items:
             print('Зона - {}'.format(zone))
             print(tiles[checked_items.index(zone)])
             products = OrderedDict()
-            for tile in tiles[checked_items.index(zone)]:
+            for tile in tiles[checked_items.index(zone)]: #перебор тайлов в зоне
                 print(tile)
                 try:
                     kwg = dict_query_kwargs.copy()
@@ -580,7 +513,6 @@ class LoadDataWindow(QDialog):
                     requests = api.query(**kwg)
                     products.update(requests)
                     print('--------')
-                    #self.info_label.setText()
                 except:
                     self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                     self.info_label.setVisible(True)
@@ -601,20 +533,6 @@ class LoadDataWindow(QDialog):
             except:
                 self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
                 self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
-
-        # for elem in list_keys:
-        #     print(products[elem]['title'])
-        #     self.zonesInfoList.appendPlainText(products[elem]['title'])
-        #
-        # path = work_path + os.sep + download_path + os.sep + zone
-        # try: #создание объекта класса загрузки файлов зоны
-        #      self.downloadProduct = downloadProducts(products, path, zone)
-        #      self.downloadProduct.setTerminationEnabled(True)
-        #      self.downloadProduct.start() #старт потока
-        #      self.connect(self.downloadProduct, pyqtSignal("finished(True)"), self.done)
-        # except:
-        #     self.info_label.setStyleSheet("color: rgb(255, 6, 60)")
-        #     self.info_label.setText('Не удалось скачать данные для "{}"'.format(zone))
 
             self.info_label.setVisible(True)
             # self.info_label.setText(
@@ -660,7 +578,6 @@ if __name__ == "__main__":
     myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-
     app = QApplication(sys.argv)
 
     app_icon = QIcon()
@@ -669,8 +586,6 @@ if __name__ == "__main__":
     app_icon.addFile('logoPlaneta.ico', QSize(32, 32))
     app_icon.addFile('logoPlaneta.ico', QSize(48, 48))
     app_icon.addFile('logoPlaneta.ico', QSize(256, 256))
-
-
 
     app.setWindowIcon(app_icon)
 

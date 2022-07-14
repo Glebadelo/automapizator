@@ -9,11 +9,7 @@ import datetime
 #import shutil
 #import ftplib
 
-
-
-
 # list_sat_name = ['S2A', 'S2B']        # список имён СПУТНИКОВ
-
 
 F_type = ''  # тип продукта извлекаемый из имени файла MSI1C/S2MSI1C
 date = ''
@@ -50,7 +46,6 @@ def func_create_map_by_arc_map():
         for filename1 in list_tifs:
             for filename2 in list_tifs:
                 mxd = 0
-
                 a = filename1.split('_')
                 b = filename2.split('_')
                 if a[2] == b[2] and a[5] != b[5]:
@@ -112,7 +107,6 @@ def func_create_map_by_arc_map():
 
                         for elm in arcpy.mapping.ListLayoutElements(mxd,
                                                                     "TEXT_ELEMENT"):  # заполняем зарамочное в проекте arcmap, введя дату и имя файлов для текстовых элементов
-
                             if elm.name == "SatilInfo1":
 
                                 if name_KA == 'S2A':
