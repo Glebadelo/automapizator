@@ -122,6 +122,8 @@ def func_create_map_by_arc_map():
                                                                                                                    1:3] + ' UTC'  # вводим в нижнюю строку информацию о дате и времени
                         outName = date[
                                   2:] + time + '.jpg'  # outName=F_type+"_"+date.replace(".","-")+".png"   - экспорт карты в формат png . при помощи метода .replace - меняем точки в стрке data на тире
+                        outName2 = date[2:] + time
+                        mxd.saveACopy(os.path.join(output_dir + os.sep, "{0}.mxd".format(outName2)))
                         arcpy.mapping.ExportToJPEG(mxd, output_dir + os.sep + outName, resolution=192)
                         del mxd
 
